@@ -260,37 +260,72 @@ class AudioFileProcessor {
             // Process each file
             for (fileURL, trackNumber) in mp3Files {
                 let filename = fileURL.lastPathComponent
+                let tagInfo = readExistingTags(from: fileURL)
+                
+                // Log what we found
+                var statusParts: [String] = []
+                statusParts.append("Track \(trackNumber) from filename")
+                if let tagTrack = tagInfo.trackNumber {
+                    if tagTrack == trackNumber {
+                        statusParts.append("tags match")
+                    } else {
+                        statusParts.append("tag shows \(tagTrack)")
+                    }
+                } else {
+                    statusParts.append("no track in tags")
+                }
+                
+                if let tagAlbum = tagInfo.album {
+                    if tagAlbum == bookId {
+                        statusParts.append("album correct")
+                    } else {
+                        statusParts.append("album: '\(tagAlbum)'")
+                    }
+                } else {
+                    statusParts.append("no album")
+                }
+                
+                logger("📋 \(filename): \(statusParts.joined(separator: ", "))")
                 
                 // Create new filename with book ID
                 let paddedNumber = String(format: "%03d", trackNumber)
                 let newFilename = "\(paddedNumber) \(bookId).mp3"
                 let newURL = fileURL.deletingLastPathComponent().appendingPathComponent(newFilename)
                 
-                // Skip if already properly named
-                if filename == newFilename {
+                let needsRename = filename != newFilename
+                let needsTagUpdate = tagInfo.trackNumber != trackNumber || tagInfo.album != bookId
+                
+                if !needsRename && !needsTagUpdate {
                     logger("✓ Already correct: \(filename)")
                     continue
                 }
                 
-                // Rename file (will overwrite if target exists)
-                do {
-                    if FileManager.default.fileExists(atPath: newURL.path) {
-                        // Remove existing file first, then move
-                        try FileManager.default.removeItem(at: newURL)
-                        logger("✓ Replaced existing: \(newFilename)")
+                // Rename file if needed
+                if needsRename {
+                    do {
+                        if FileManager.default.fileExists(atPath: newURL.path) {
+                            // Remove existing file first, then move
+                            try FileManager.default.removeItem(at: newURL)
+                            logger("✓ Replaced existing: \(newFilename)")
+                        }
+                        try FileManager.default.moveItem(at: fileURL, to: newURL)
+                        logger("✓ Renamed: \(filename) → \(newFilename)")
+                        filesRenamed += 1
+                    } catch {
+                        logger("✗ Failed to rename \(filename): \(error.localizedDescription)")
+                        errors += 1
+                        continue
                     }
-                    try FileManager.default.moveItem(at: fileURL, to: newURL)
-                    logger("✓ Renamed: \(filename) → \(newFilename)")
-                    filesRenamed += 1
-                    
-                    // Update tags
-                    if updateTrackNumberSync(for: newURL, trackNumber: trackNumber, logger: logger) {
+                }
+                
+                // Update tags (always check, even if file wasn't renamed)
+                let fileToUpdate = needsRename ? newURL : fileURL
+                if needsTagUpdate {
+                    if updateTrackNumberSync(for: fileToUpdate, trackNumber: trackNumber, bookId: bookId, logger: logger) {
                         tagsUpdated += 1
                     }
-                    
-                } catch {
-                    logger("✗ Failed to rename \(filename): \(error.localizedDescription)")
-                    errors += 1
+                } else {
+                    logger("✓ Tags already correct: \(fileToUpdate.lastPathComponent)")
                 }
             }
             
@@ -315,15 +350,33 @@ class AudioFileProcessor {
             let filename = fileURL.lastPathComponent
             
             if filename.lowercased().hasSuffix(".mp3") {
-                // Look for pattern like "001_something.mp3" or "001.mp3"
                 let nameWithoutExtension = String(filename.dropLast(4))
+                var trackNumberFromName: Int? = nil
                 
-                // Check if starts with 3 digits followed by underscore or is purely numeric
-                if let match = nameWithoutExtension.range(of: "^(\\d{3})(_.*)?$", options: .regularExpression) {
+                // Check filename pattern for track number
+                if nameWithoutExtension.range(of: "^(\\d{3})([_ ].*)?$", options: .regularExpression) != nil {
                     let numberPart = String(nameWithoutExtension[nameWithoutExtension.startIndex..<nameWithoutExtension.index(nameWithoutExtension.startIndex, offsetBy: 3)])
-                    if let trackNumber = Int(numberPart) {
-                        mp3Files.append((fileURL, trackNumber))
-                    }
+                    trackNumberFromName = Int(numberPart)
+                }
+                
+                // Read existing tags to get track number
+                let tagInfo = readExistingTags(from: fileURL)
+                
+                // Decide which track number to use
+                let finalTrackNumber: Int?
+                if let nameTrack = trackNumberFromName {
+                    // Prefer filename track number as source of truth
+                    finalTrackNumber = nameTrack
+                } else if let tagTrack = tagInfo.trackNumber {
+                    // Fallback to tag track number if filename doesn't contain one
+                    finalTrackNumber = tagTrack
+                } else {
+                    // No track number found in either place
+                    finalTrackNumber = nil
+                }
+                
+                if let trackNumber = finalTrackNumber {
+                    mp3Files.append((fileURL, trackNumber))
                 }
             }
         }
@@ -331,26 +384,20 @@ class AudioFileProcessor {
         return mp3Files.sorted { $0.1 < $1.1 }
     }
     
-    private func updateTrackNumberSync(for fileURL: URL, trackNumber: Int, logger: @escaping (String) -> Void) -> Bool {
+    private func readExistingTags(from fileURL: URL) -> (trackNumber: Int?, album: String?, title: String?) {
+        // Get the Python script path
+        let bundlePath = Bundle.main.bundlePath
+        let scriptPath = URL(fileURLWithPath: bundlePath)
+            .deletingLastPathComponent()
+            .appendingPathComponent("update-mp3-tags.py")
         
-        let script = """
-        tell application "Music"
-            try
-                set track_file to (POSIX file "\(fileURL.path)") as alias
-                set temp_track to add track_file
-                set track number of temp_track to \(trackNumber)
-                set name of temp_track to "Track \(trackNumber)"
-                delete temp_track
-                return "success"
-            on error error_message
-                return "error: " & error_message
-            end try
-        end tell
-        """
+        guard FileManager.default.fileExists(atPath: scriptPath.path) else {
+            return (nil, nil, nil)
+        }
         
         let process = Process()
-        process.launchPath = "/usr/bin/osascript"
-        process.arguments = ["-e", script]
+        process.launchPath = "/usr/bin/python3"
+        process.arguments = [scriptPath.path, fileURL.path, "--read-tags"]
         
         let pipe = Pipe()
         process.standardOutput = pipe
@@ -360,14 +407,77 @@ class AudioFileProcessor {
             try process.run()
             process.waitUntilExit()
             
-            let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            let output = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            if process.terminationStatus == 0 {
+                let data = pipe.fileHandleForReading.readDataToEndOfFile()
+                if let output = String(data: data, encoding: .utf8) {
+                    return parseTagOutput(output)
+                }
+            }
+        } catch {
+            // Failed to read tags, return empty
+        }
+        
+        return (nil, nil, nil)
+    }
+    
+    private func parseTagOutput(_ output: String) -> (trackNumber: Int?, album: String?, title: String?) {
+        var trackNumber: Int? = nil
+        var album: String? = nil
+        var title: String? = nil
+        
+        for line in output.components(separatedBy: .newlines) {
+            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed.hasPrefix("Track: ") {
+                let trackStr = String(trimmed.dropFirst(7))
+                trackNumber = Int(trackStr)
+            } else if trimmed.hasPrefix("Album: ") {
+                album = String(trimmed.dropFirst(7))
+            } else if trimmed.hasPrefix("Title: ") {
+                title = String(trimmed.dropFirst(7))
+            }
+        }
+        
+        return (trackNumber, album, title)
+    }
+    
+    private func updateTrackNumberSync(for fileURL: URL, trackNumber: Int, bookId: String, logger: @escaping (String) -> Void) -> Bool {
+        
+        // Get the directory where this app bundle is located
+        let bundlePath = Bundle.main.bundlePath
+        let scriptPath = URL(fileURLWithPath: bundlePath)
+            .deletingLastPathComponent()
+            .appendingPathComponent("update-mp3-tags.py")
+        
+        // Check if the Python script exists
+        guard FileManager.default.fileExists(atPath: scriptPath.path) else {
+            logger("⚠️ Tag update script not found: \(scriptPath.lastPathComponent)")
+            return false
+        }
+        
+        let process = Process()
+        process.launchPath = "/usr/bin/python3"
+        var arguments = [scriptPath.path, fileURL.path, "--track", String(trackNumber)]
+        if !bookId.isEmpty {
+            arguments.append("--album")
+            arguments.append(bookId)
+        }
+        process.arguments = arguments
+        
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = pipe
+        
+        do {
+            try process.run()
+            process.waitUntilExit()
             
-            if output == "success" {
+            if process.terminationStatus == 0 {
                 logger("✓ Updated tags: \(fileURL.lastPathComponent) → Track #\(trackNumber)")
                 return true
             } else {
-                logger("⚠️ Tag update failed: \(fileURL.lastPathComponent)")
+                let errorData = pipe.fileHandleForReading.readDataToEndOfFile()
+                let errorOutput = String(data: errorData, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "Unknown error"
+                logger("⚠️ Tag update failed: \(fileURL.lastPathComponent) - \(errorOutput)")
                 return false
             }
         } catch {
