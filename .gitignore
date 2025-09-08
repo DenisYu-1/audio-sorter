@@ -31,6 +31,12 @@ env/
 venv/
 ENV/
 
+# Backup Files
+*-backup.py
+
+# Bundled Python Libraries
+**/python-libs/
+
 # Test Files & Directories
 test-mp3s/
 test-music/

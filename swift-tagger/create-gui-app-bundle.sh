@@ -81,7 +81,16 @@ echo "   • Real-time progress display"
 echo "   • Live logging of operations"
 echo "   • Zero installation required"
 echo ""
+# Install bundled Python dependencies
+echo "📦 Installing bundled Python dependencies..."
+PYTHON_LIBS_DIR="$APP_CONTENTS/Resources/python-libs"
+mkdir -p "$PYTHON_LIBS_DIR"
+
+# Install mutagen into the app bundle
+pip3 install --target "$PYTHON_LIBS_DIR" mutagen
+
 echo "📦 Distribution:"
 echo "   Copy '$BUNDLE_NAME' to any Mac and double-click!"
 echo "   ✅ Universal Binary: Works on Intel & Apple Silicon Macs"
+echo "   ✅ Zero Dependencies: mutagen bundled inside app"
 echo "   ✅ Minimum macOS: 10.15 Catalina"

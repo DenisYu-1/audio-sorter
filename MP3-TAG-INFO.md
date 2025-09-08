@@ -59,19 +59,20 @@ File: 25.mp3
 
 ### Required for Tag Updates
 - **Python 3** (built into macOS)
-- **Mutagen library**: Auto-installed when first used
+- **Mutagen library**: **Automatically bundled** with the app
 
-### Installation Process
-1. First run attempts to install `mutagen` automatically
-2. If auto-install fails, manual installation:
-   ```bash
-   pip3 install mutagen
-   ```
+### Self-Contained Design
+The app includes a bundled version of `mutagen` library:
+- ✅ **No installation required** - everything is included
+- ✅ **Consistent behavior** - same version on all systems
+- ✅ **Offline operation** - no internet required
+- ✅ **Version controlled** - no dependency conflicts
 
-### Fallback Behavior
-- If tag updating fails, **filename renaming still works**
-- App shows warnings but continues successfully
-- GUI provides clear feedback about tag update status
+### Error Handling
+- Uses **bundled mutagen library only** (no system dependencies)
+- If bundled library missing, **filename renaming still works**
+- App shows clear error messages and rebuild instructions
+- GUI provides detailed feedback about operations
 
 ## Usage
 

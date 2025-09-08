@@ -34,11 +34,11 @@ Audio Sorter automatically renames your MP3 files with proper zero-padding and u
 
 ### **✨ Features:**
 - ✅ **Zero-padding** - Converts `1.mp3` → `001.mp3`
-- ✅ **Updates MP3 track numbers** using Music app integration
+- ✅ **Updates MP3 track numbers** using bundled Python libraries
 - ✅ **Smart conflict resolution** - Fixes filename conflicts automatically
 - ✅ **Drag & drop interface** - No typing required
 - ✅ **Real-time progress** - See exactly what's happening
-- ✅ **Zero installation** - No dependencies or setup needed
+- ✅ **Zero installation** - All dependencies bundled inside app
 
 ### **📱 App Location:**
 ```bash
@@ -80,7 +80,7 @@ swiftc SimpleAudioSorter.swift -o SimpleAudioSorter
 ./create-gui-app-bundle.sh
 ```
 
-#### **Universal Binary (Recommended for Distribution):**
+#### **Universal Binary with Bundled Dependencies (Recommended):**
 ```bash
 cd swift-tagger
 # Create universal binary (Intel + Apple Silicon)
@@ -88,17 +88,18 @@ swiftc -target arm64-apple-macos11.0 -o SimpleAudioSorter-arm64 SimpleAudioSorte
 swiftc -target x86_64-apple-macos10.15 -o SimpleAudioSorter-x86_64 SimpleAudioSorter.swift  
 lipo -create -output SimpleAudioSorter SimpleAudioSorter-arm64 SimpleAudioSorter-x86_64
 
-# Create app bundle
+# Create self-contained app bundle (includes mutagen)
 ./create-gui-app-bundle.sh
 
 # Clean up temporary files
 rm -f SimpleAudioSorter-arm64 SimpleAudioSorter-x86_64
 ```
 
-**Universal binary works on:**
+**Self-contained app works on:**
 - ✅ Apple Silicon Macs (M1, M2, M3, etc.)
-- ✅ Intel Macs
+- ✅ Intel Macs  
 - ✅ macOS 10.15 Catalina and newer
+- ✅ **Zero dependencies** - mutagen bundled inside app bundle
 
 ### **🧪 Test the App:**
 ```bash
