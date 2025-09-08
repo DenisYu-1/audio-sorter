@@ -70,24 +70,26 @@ File: 25.mp3
 
 ### Fallback Behavior
 - If tag updating fails, **filename renaming still works**
-- Script shows warnings but continues successfully
-- Use `--no-tags` flag to skip tag updates entirely
+- App shows warnings but continues successfully
+- GUI provides clear feedback about tag update status
 
-## Usage Options
+## Usage
 
-### Include Tag Updates (Default)
+### GUI Application (Recommended)
 ```bash
-./sort-audio.sh /path/to/music
+# Open the app
+open "swift-tagger/Audio Sorter.app"
+
+# Then drag your music folder into the app window
+# and click "Sort Audio Files"
 ```
 
-### Skip Tag Updates
+### Manual Build & Run
 ```bash
-./sort-audio.sh /path/to/music --no-tags
-```
-
-### Preview Mode
-```bash
-./sort-audio.sh /path/to/music --dry-run
+cd swift-tagger
+swiftc SimpleAudioSorter.swift -o SimpleAudioSorter
+./create-gui-app-bundle.sh
+open "Audio Sorter.app"
 ```
 
 ## Technical Details
@@ -166,7 +168,8 @@ brew install python
 chmod 644 *.mp3
 
 # Or run with sudo (not recommended)
-sudo ./sort-audio.sh /path/to/music
+open "swift-tagger/Audio Sorter.app"
+# Drag your music folder into the app
 ```
 
 ### Tags not visible in player

@@ -65,8 +65,6 @@ audio-sorter/
 │   ├── SimpleAudioSorter.swift    # ← Source code
 │   ├── create-gui-app-bundle.sh   # ← Build script
 │   └── update-mp3-tags.py         # ← Python script for tag updates
-├── test-audio-sorter.sh           # ← Test suite
-├── sort-audio.sh                  # ← CLI version (optional)
 ├── create-distribution.sh         # ← Distribution package creator
 └── MP3-TAG-INFO.md               # ← Technical documentation
 ```
@@ -102,10 +100,18 @@ rm -f SimpleAudioSorter-arm64 SimpleAudioSorter-x86_64
 - ✅ Intel Macs
 - ✅ macOS 10.15 Catalina and newer
 
-### **🧪 Test with Sample Files:**
+### **🧪 Test the App:**
 ```bash
-./test-audio-sorter.sh create    # Create test MP3 files
-./test-audio-sorter.sh cleanup   # Clean up test files
+# Create test MP3 files manually:
+mkdir test-audio && cd test-audio
+touch {1,2,10,25,100}.mp3
+
+# Test with the GUI app:
+open "../swift-tagger/Audio Sorter.app"
+# Drag the test-audio folder into the app
+
+# Cleanup:
+cd .. && rm -rf test-audio
 ```
 
 ---
@@ -173,20 +179,6 @@ Chapter 001.mp3 → Chapter 002.mp3 → Chapter 003.mp3 → Chapter 010.mp3 → 
 4. **Click "Sort Audio Files"**
 5. **Copy to child's MP3 player**
 6. **Enjoy perfect playback order!** 🎵
-
----
-
-## 🔧 **Command Line Option**
-
-For advanced users who prefer command-line usage:
-
-```bash
-./sort-audio.sh "/path/to/music/folder"
-```
-
-### **CLI Features:**
-- Dry-run mode: `./sort-audio.sh "/path" true`
-- Skip tags: `./sort-audio.sh "/path" false false`
 
 ---
 
