@@ -8,10 +8,7 @@ ehthumbs.db
 Thumbs.db
 
 # Compiled Swift Binaries & App Bundles
-swift-tagger/SimpleAudioSorter
-swift-tagger/SimpleAudioSorter-arm64
-swift-tagger/SimpleAudioSorter-x86_64
-swift-tagger/SimpleAudioSorter-universal
+swift-tagger/SimpleAudioSorter*
 *.app/
 **/*.app/
 
