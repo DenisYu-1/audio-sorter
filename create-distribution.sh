@@ -176,5 +176,3 @@ echo "   • Perfect for helping other parents with audiobook chaos!"
 echo ""
 echo "📋 Package contents:"
 ls -la "$PACKAGE_DIR"
-
-
