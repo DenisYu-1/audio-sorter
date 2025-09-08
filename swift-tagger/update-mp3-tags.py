@@ -3,6 +3,7 @@
 import os
 import sys
 import re
+import argparse
 from pathlib import Path
 
 def ensure_mutagen():
@@ -42,7 +43,7 @@ def ensure_mutagen():
 def update_mp3_tags(directory_path):
     """Update MP3 track numbers based on filename."""
     if not ensure_mutagen():
-        print("Error: Cannot install mutagen library")
+        print("Error: Cannot load mutagen library")
         return False
     
     from mutagen.mp3 import MP3
@@ -95,13 +96,100 @@ def update_mp3_tags(directory_path):
     print(f"Successfully updated {success_count}/{len(mp3_files)} files")
     return success_count > 0
 
-def main():
-    if len(sys.argv) != 2:
-        print("Usage: python3 update-mp3-tags.py <directory>")
-        sys.exit(1)
+def update_single_file(file_path, track_number, album=None):
+    """Update a single MP3 file's tags."""
+    if not ensure_mutagen():
+        return False
     
-    directory = sys.argv[1]
-    success = update_mp3_tags(directory)
+    from mutagen.mp3 import MP3
+    from mutagen.id3 import ID3NoHeaderError, TRCK, TIT2, TALB
+    
+    if not os.path.isfile(file_path):
+        print(f"Error: File not found: {file_path}")
+        return False
+    
+    if not file_path.lower().endswith('.mp3'):
+        print(f"Error: Not an MP3 file: {file_path}")
+        return False
+    
+    try:
+        # Load MP3 file
+        audio = MP3(file_path)
+        
+        # Add ID3 tag if it doesn't exist
+        if audio.tags is None:
+            audio.add_tags()
+        
+        # Set track number
+        audio.tags['TRCK'] = TRCK(encoding=3, text=str(track_number))
+        
+        # Set album if provided
+        if album:
+            audio.tags['TALB'] = TALB(encoding=3, text=album)
+        
+        # Set title if it's just a number or missing
+        current_title = str(audio.tags.get('TIT2', ''))
+        if not current_title or current_title.isdigit():
+            audio.tags['TIT2'] = TIT2(encoding=3, text=f"Track {track_number}")
+        
+        # Save changes
+        audio.save()
+        print(f"✓ Updated: Track {track_number}" + (f", Album: {album}" if album else ""))
+        return True
+        
+    except Exception as e:
+        print(f"✗ Failed to update: {e}")
+        return False
+
+def read_file_tags(file_path):
+    """Read and display tags from a single MP3 file."""
+    if not ensure_mutagen():
+        return False
+    
+    from mutagen.mp3 import MP3
+    
+    try:
+        audio = MP3(file_path)
+        if audio.tags is None:
+            return True  # No tags, that's fine
+        
+        # Output in format Swift can parse
+        if 'TRCK' in audio.tags:
+            track = str(audio.tags['TRCK'][0]).split('/')[0]  # Handle "1/10" format
+            print(f"Track: {track}")
+        
+        if 'TALB' in audio.tags:
+            print(f"Album: {audio.tags['TALB'][0]}")
+        
+        if 'TIT2' in audio.tags:
+            print(f"Title: {audio.tags['TIT2'][0]}")
+        
+        return True
+        
+    except Exception as e:
+        print(f"Error reading tags: {e}")
+        return False
+
+def main():
+    parser = argparse.ArgumentParser(description='Update MP3 track number tags')
+    parser.add_argument('path', help='MP3 file or directory path')
+    parser.add_argument('--track', '-t', type=int, help='Track number (for single file)')
+    parser.add_argument('--album', '-a', help='Album name (for single file)')
+    parser.add_argument('--read-tags', action='store_true', help='Read and display existing tags from file')
+    
+    args = parser.parse_args()
+    
+    # Handle different modes
+    if args.read_tags:
+        # Read tags from single file
+        success = read_file_tags(args.path)
+    elif args.track is not None:
+        # Update single file with track number
+        success = update_single_file(args.path, args.track, args.album)
+    else:
+        # Update directory (original behavior)
+        success = update_mp3_tags(args.path)
+    
     sys.exit(0 if success else 1)
 
 if __name__ == "__main__":
