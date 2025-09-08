@@ -12,7 +12,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Create window
         window = NSWindow(
             contentRect: NSRect(x: 100, y: 100, width: 600, height: 500),
-            styleMask: [.titled, .closable, .miniaturizable, .resizable],
+            styleMask: [.titled, .closable, .miniaturizable],
             backing: .buffered,
             defer: false
         )
