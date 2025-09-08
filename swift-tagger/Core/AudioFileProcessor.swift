@@ -13,7 +13,7 @@ class AudioFileProcessor {
             let mp3Files = try findMP3Files(in: directoryURL)
             
             if mp3Files.isEmpty {
-                logger("No numbered MP3 files found (looking for files starting with numbers like 001_...)")
+                logger("No numbered MP3 files found (looking for files starting with numbers like 1.mp3, 001_title.mp3, etc.)")
                 return ProcessingResults(filesRenamed: 0, tagsUpdated: 0, errors: 0)
             }
             
@@ -115,9 +115,9 @@ class AudioFileProcessor {
                 let nameWithoutExtension = String(filename.dropLast(4))
                 var trackNumberFromName: Int? = nil
                 
-                // Check filename pattern for track number
-                if nameWithoutExtension.range(of: "^(\\d{3})([_ ].*)?$", options: .regularExpression) != nil {
-                    let numberPart = String(nameWithoutExtension[nameWithoutExtension.startIndex..<nameWithoutExtension.index(nameWithoutExtension.startIndex, offsetBy: 3)])
+                // Check filename pattern for track number (supports 1.mp3, 01.mp3, 001.mp3, 001_title.mp3, etc.)
+                if let range = nameWithoutExtension.range(of: "^(\\d+)", options: .regularExpression) {
+                    let numberPart = String(nameWithoutExtension[range])
                     trackNumberFromName = Int(numberPart)
                 }
                 

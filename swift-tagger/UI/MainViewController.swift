@@ -24,7 +24,7 @@ class MainViewController: NSViewController {
         headerLabel.frame = NSRect(x: 50, y: 430, width: 500, height: 40)
         view.addSubview(headerLabel)
         
-        let subtitleLabel = NSTextField(labelWithString: "Rename numbered audio files: 001_...mp3 → 001 <Book ID>.mp3")
+        let subtitleLabel = NSTextField(labelWithString: "Rename numbered audio files: 1.mp3 → 001 <Book ID>.mp3")
         subtitleLabel.font = NSFont.systemFont(ofSize: 12)
         subtitleLabel.alignment = .center
         subtitleLabel.textColor = .secondaryLabelColor
@@ -72,9 +72,9 @@ class MainViewController: NSViewController {
         optionsLabel.frame = NSRect(x: 30, y: 230, width: 200, height: 20)
         view.addSubview(optionsLabel)
         
-        let option1 = NSTextField(labelWithString: "✓ Finds files starting with track numbers (001_, 002_, etc.)")
+        let option1 = NSTextField(labelWithString: "✓ Finds files starting with track numbers (1.mp3, 001_title.mp3, etc.)")
         option1.font = NSFont.systemFont(ofSize: 12)
-        option1.frame = NSRect(x: 50, y: 205, width: 400, height: 20)
+        option1.frame = NSRect(x: 50, y: 205, width: 450, height: 20)
         view.addSubview(option1)
         
         let option2 = NSTextField(labelWithString: "✓ Renames to clean format: '001 Book Title.mp3'")
@@ -131,7 +131,7 @@ class MainViewController: NSViewController {
         openPanel.canChooseDirectories = true
         openPanel.allowsMultipleSelection = false
         openPanel.prompt = "Select Music Folder"
-        openPanel.message = "Choose a folder containing numbered MP3 files (e.g., 001_track.mp3)"
+        openPanel.message = "Choose a folder containing numbered MP3 files (e.g., 1.mp3, 001_track.mp3)"
         
         if openPanel.runModal() == .OK {
             if let url = openPanel.url {
