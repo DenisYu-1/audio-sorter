@@ -9,6 +9,14 @@ BINARY_NAME="SimpleAudioSorter"
 
 echo "Creating macOS GUI App Bundle: $BUNDLE_NAME"
 
+# Compile all Swift files into the binary
+echo "🔨 Compiling modularized Swift source files..."
+if ! swiftc main.swift Utils/AppDelegate.swift UI/MainViewController.swift UI/DragDropView.swift Core/AudioFileProcessor.swift Core/ProcessingResults.swift -o "$BINARY_NAME"; then
+    echo "❌ Error: Failed to compile Swift files"
+    exit 1
+fi
+echo "✅ Compilation successful"
+
 # Remove existing bundle if it exists
 if [[ -d "$BUNDLE_NAME" ]]; then
     rm -rf "$BUNDLE_NAME"
@@ -83,7 +91,7 @@ echo "   • Zero installation required"
 echo ""
 # Install bundled Python dependencies
 echo "📦 Installing bundled Python dependencies..."
-PYTHON_LIBS_DIR="$APP_CONTENTS/Resources/python-libs"
+PYTHON_LIBS_DIR="$BUNDLE_NAME/Contents/Resources/python-libs"
 mkdir -p "$PYTHON_LIBS_DIR"
 
 # Install mutagen into the app bundle

@@ -30,6 +30,7 @@ ENV/
 
 # Backup Files
 *-backup.py
+*-original.swift
 
 # Bundled Python Libraries
 **/python-libs/
