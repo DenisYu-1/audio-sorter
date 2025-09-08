@@ -57,18 +57,6 @@ Simply copy `Audio Sorter.app` to any Mac and double-click! No installation requ
 
 ## 🛠️ **For Developers**
 
-### **📂 Project Structure:**
-```
-audio-sorter/
-├── swift-tagger/
-│   ├── Audio Sorter.app/          # ← Ready-to-use GUI app
-│   ├── SimpleAudioSorter.swift    # ← Source code
-│   ├── create-gui-app-bundle.sh   # ← Build script
-│   └── update-mp3-tags.py         # ← Python script for tag updates
-├── create-distribution.sh         # ← Distribution package creator
-└── MP3-TAG-INFO.md               # ← Technical documentation
-```
-
 **📚 For technical details about MP3 tags, dependencies, and compatibility, see [MP3-TAG-INFO.md](MP3-TAG-INFO.md)**
 
 ### **🔧 Rebuild the App:**
