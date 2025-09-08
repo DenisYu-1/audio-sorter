@@ -1,0 +1,69 @@
+# macOS System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Compiled Swift Binaries
+swift-tagger/SimpleAudioSorter
+swift-tagger/SimpleAudioSorter-arm64
+swift-tagger/SimpleAudioSorter-x86_64
+swift-tagger/SimpleAudioSorter-universal
+
+# Distribution Artifacts
+dist/
+*.zip
+*.dmg
+*.pkg
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Test Files & Directories
+test-mp3s/
+test-music/
+*.test.mp3
+**/test*.mp3
+
+# IDE & Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+debug.log
+error.log
+
+# Temporary Files
+*.tmp
+*.temp
+.cache/
+
+# Build Artifacts
+build/
+*.dSYM/
+
+# Audio Files (don't commit sample audio)
+*.mp3
+*.m4a
+*.wav
+*.flac
+!example*.mp3
+
+# Archives
+*.tar.gz
+*.rar
+*.7z

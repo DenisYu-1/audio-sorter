@@ -43,7 +43,7 @@ cat > "$BUNDLE_NAME/Contents/Info.plist" << 'EOF'
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>LSMinimumSystemVersion</key>
-    <string>11.0</string>
+    <string>10.15</string>
     <key>NSHumanReadableCopyright</key>
     <string>© 2024 Audio Sorter</string>
     <key>NSPrincipalClass</key>
@@ -83,3 +83,5 @@ echo "   • Zero installation required"
 echo ""
 echo "📦 Distribution:"
 echo "   Copy '$BUNDLE_NAME' to any Mac and double-click!"
+echo "   ✅ Universal Binary: Works on Intel & Apple Silicon Macs"
+echo "   ✅ Minimum macOS: 10.15 Catalina"

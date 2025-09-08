@@ -64,18 +64,43 @@ audio-sorter/
 │   ├── Audio Sorter.app/          # ← Ready-to-use GUI app
 │   ├── SimpleAudioSorter.swift    # ← Source code
 │   ├── create-gui-app-bundle.sh   # ← Build script
-│   └── README.md                  # ← Technical details
+│   └── update-mp3-tags.py         # ← Python script for tag updates
 ├── test-audio-sorter.sh           # ← Test suite
 ├── sort-audio.sh                  # ← CLI version (optional)
+├── create-distribution.sh         # ← Distribution package creator
 └── MP3-TAG-INFO.md               # ← Technical documentation
 ```
 
+**📚 For technical details about MP3 tags, dependencies, and compatibility, see [MP3-TAG-INFO.md](MP3-TAG-INFO.md)**
+
 ### **🔧 Rebuild the App:**
+
+#### **Quick Build (Single Architecture):**
 ```bash
 cd swift-tagger
 swiftc SimpleAudioSorter.swift -o SimpleAudioSorter
 ./create-gui-app-bundle.sh
 ```
+
+#### **Universal Binary (Recommended for Distribution):**
+```bash
+cd swift-tagger
+# Create universal binary (Intel + Apple Silicon)
+swiftc -target arm64-apple-macos11.0 -o SimpleAudioSorter-arm64 SimpleAudioSorter.swift
+swiftc -target x86_64-apple-macos10.15 -o SimpleAudioSorter-x86_64 SimpleAudioSorter.swift  
+lipo -create -output SimpleAudioSorter SimpleAudioSorter-arm64 SimpleAudioSorter-x86_64
+
+# Create app bundle
+./create-gui-app-bundle.sh
+
+# Clean up temporary files
+rm -f SimpleAudioSorter-arm64 SimpleAudioSorter-x86_64
+```
+
+**Universal binary works on:**
+- ✅ Apple Silicon Macs (M1, M2, M3, etc.)
+- ✅ Intel Macs
+- ✅ macOS 10.15 Catalina and newer
 
 ### **🧪 Test with Sample Files:**
 ```bash
@@ -199,6 +224,47 @@ Try: `chmod +x "swift-tagger/Audio Sorter.app/Contents/MacOS/SimpleAudioSorter"`
 - Only processes files matching pattern: `1.mp3`, `2.mp3`, etc.
 - Files like `Track 1.mp3` or `song.mp3` are ignored
 - Use numbered files only: `1.mp3`, `2.mp3`, `10.mp3`
+
+---
+
+## 📦 **Distribution & Sharing**
+
+### **🚀 Create Distribution Package:**
+```bash
+./create-distribution.sh
+```
+Creates `dist/AudioSorter-v1.0.zip` (56KB) with:
+- ✅ Ready-to-use GUI app
+- ✅ Installation instructions  
+- ✅ Security guide for macOS warnings
+- ✅ Usage examples
+
+### **📤 Distribution Options:**
+
+#### **1. Simple File Sharing (Easiest)**
+```bash
+# Share the zip file directly
+zip -r "Audio Sorter.zip" "swift-tagger/Audio Sorter.app"
+```
+**✅ Pros:** Instant, works immediately  
+**❌ Cons:** Recipients get "unidentified developer" warning
+
+#### **2. GitHub Releases (Recommended)**
+1. Upload `AudioSorter-v1.0.zip` to GitHub releases
+2. Add release notes explaining audiobook use case
+3. Share the download link
+
+**✅ Pros:** Professional, version tracking, easy updates
+
+#### **3. Professional Distribution (Advanced)**
+- **Apple Developer Account** ($99/year)
+- **Code signing** for trusted distribution
+- **Notarization** to eliminate security warnings
+
+### **🎯 Perfect for Sharing With:**
+- 👨‍👩‍👧‍👦 **Parents** preparing audiobooks
+- 🎵 **Audio enthusiasts** organizing music
+- 🏫 **Educators** with audio content
 
 ---
 
