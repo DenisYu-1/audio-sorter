@@ -153,16 +153,6 @@ print('Title:', audio.tags.get('TIT2'))
 
 ## Troubleshooting
 
-### "Mutagen not found"
-```bash
-# Manual installation
-pip3 install mutagen
-
-# Or use Homebrew Python
-brew install python
-/usr/local/bin/pip3 install mutagen
-```
-
 ### "Permission denied" 
 ```bash
 # Make sure you own the MP3 files
@@ -177,21 +167,3 @@ open "swift-tagger/Audio Sorter.app"
 - Some players cache metadata
 - Try refreshing/rescanning library
 - Older players may not support ID3v2
-
-## Alternative Tools
-
-If you prefer other tag editing tools:
-
-### Command Line Tools
-```bash
-# Install via Homebrew
-brew install id3v2
-
-# Update track number
-id3v2 -T 1 001.mp3
-```
-
-### GUI Applications
-- **MP3Tag** (Windows/Mac)
-- **Kid3** (Cross-platform)
-- **MusicBrainz Picard** (Advanced tagging)
