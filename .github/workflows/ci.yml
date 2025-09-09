@@ -36,6 +36,14 @@ jobs:
         bash -n swift-tagger/create-gui-app-bundle.sh
         echo "✅ Shell scripts syntax is valid"
         
+    - name: 📦 Install Python Dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        pip3 install mutagen --break-system-packages || pip3 install mutagen --user || pip3 install mutagen
+        
     - name: 🧪 Run Test Suites
-      run: ./swift-tagger/run_tests.sh
+      run: |
+        cd swift-tagger
+        chmod +x run_tests.sh
+        ./run_tests.sh
 

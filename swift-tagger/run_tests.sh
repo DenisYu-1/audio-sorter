@@ -43,17 +43,39 @@ fi
 # Check if mutagen is available
 if ! python3 -c "import mutagen" 2>/dev/null; then
     print_warning "Installing mutagen for tests..."
-    pip3 install mutagen
+    
+    # Try different installation methods for compatibility
+    if pip3 install mutagen --break-system-packages 2>/dev/null; then
+        print_status "Installed mutagen with --break-system-packages"
+    elif pip3 install mutagen --user 2>/dev/null; then
+        print_status "Installed mutagen with --user"
+    elif python3 -m pip install mutagen --break-system-packages 2>/dev/null; then
+        print_status "Installed mutagen via python -m pip with --break-system-packages"
+    else
+        print_error "Failed to install mutagen. Please install manually:"
+        print_error "  pip3 install mutagen --user"
+        print_error "  or: pip3 install mutagen --break-system-packages"
+        exit 1
+    fi
 fi
 
 # Run Python tests
 echo "Running Python test suite..."
-if python3 test_functional.py; then
-    print_status "Python tests passed"
+if python3 test_functional.py 2>&1 | tee test_output.log; then
+    # Check if there were any test failures in the output
+    if grep -q "FAILED" test_output.log || grep -q "ERROR" test_output.log; then
+        print_error "Python tests had failures - check output above"
+        rm -f test_output.log
+        exit 1
+    else
+        print_status "Python tests passed"
+    fi
 else
-    print_error "Python tests failed"
+    print_error "Python tests failed to run"
+    rm -f test_output.log
     exit 1
 fi
+rm -f test_output.log
 
 # Test Swift functionality (if XCTest is available)
 echo ""

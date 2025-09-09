@@ -29,11 +29,30 @@ def main():
         print("✅ mutagen library is available")
     except ImportError:
         print("⚠️ Installing mutagen...")
-        try:
-            subprocess.check_call([sys.executable, "-m", "pip", "install", "mutagen"])
-            print("✅ mutagen installed successfully")
-        except subprocess.CalledProcessError:
-            print("❌ Failed to install mutagen")
+        
+        # Try different installation methods for compatibility
+        install_commands = [
+            [sys.executable, "-m", "pip", "install", "mutagen", "--break-system-packages"],
+            [sys.executable, "-m", "pip", "install", "mutagen", "--user"],
+            ["pip3", "install", "mutagen", "--break-system-packages"],
+            ["pip3", "install", "mutagen", "--user"]
+        ]
+        
+        installed = False
+        for cmd in install_commands:
+            try:
+                subprocess.check_call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                print(f"✅ mutagen installed successfully with: {' '.join(cmd[-2:])}")
+                installed = True
+                break
+            except (subprocess.CalledProcessError, FileNotFoundError):
+                continue
+        
+        if not installed:
+            print("❌ Failed to install mutagen with any method")
+            print("Please install manually:")
+            print("  pip3 install mutagen --user")
+            print("  or: pip3 install mutagen --break-system-packages")
             return 1
     
     # Run the tests
