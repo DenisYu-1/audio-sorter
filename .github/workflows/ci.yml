@@ -1,0 +1,38 @@
+name: 🎵 Audio Sorter CI
+
+on:
+  push:
+    branches: [ main, develop, ci ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-test:
+    name: 🔧 Build & Test
+    runs-on: macos-latest
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: 🔨 Test Swift Compilation
+      run: |
+        cd swift-tagger
+        echo "Testing Swift compilation..."
+        swiftc main.swift Utils/AppDelegate.swift UI/MainViewController.swift UI/DragDropView.swift Core/AudioFileProcessor.swift Core/ProcessingResults.swift -o SimpleAudioSorter-test
+        echo "✅ Swift compilation successful"
+        rm -f SimpleAudioSorter-test
+        
+    - name: 🐍 Test Python Syntax
+      run: |
+        echo "Testing Python script syntax..."
+        python3 -m py_compile swift-tagger/update-mp3-tags.py
+        echo "✅ Python syntax is valid"
+        
+    - name: 🐚 Test Shell Script Syntax
+      run: |
+        echo "Testing shell script syntax..."
+        bash -n create-distribution.sh
+        bash -n swift-tagger/create-gui-app-bundle.sh
+        echo "✅ Shell scripts syntax is valid"
+
