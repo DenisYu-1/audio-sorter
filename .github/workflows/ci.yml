@@ -35,4 +35,7 @@ jobs:
         bash -n create-distribution.sh
         bash -n swift-tagger/create-gui-app-bundle.sh
         echo "✅ Shell scripts syntax is valid"
+        
+    - name: 🧪 Run Test Suites
+      run: ./swift-tagger/run_tests.sh
 
