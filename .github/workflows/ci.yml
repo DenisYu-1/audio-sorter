@@ -35,4 +35,35 @@ jobs:
         bash -n create-distribution.sh
         bash -n swift-tagger/create-gui-app-bundle.sh
         echo "✅ Shell scripts syntax is valid"
+        
+    - name: 📦 Install Python Dependencies
+      run: |
+        echo "Setting up Python dependencies..."
+        
+        # Check if mutagen is already available
+        if python3 -c "import mutagen" 2>/dev/null; then
+          echo "✅ mutagen already available"
+        else
+          echo "Installing mutagen..."
+          
+          # Try multiple installation methods
+          if pip3 install mutagen --break-system-packages 2>/dev/null; then
+            echo "✅ Installed mutagen with --break-system-packages"
+          elif pip3 install mutagen --user 2>/dev/null; then
+            echo "✅ Installed mutagen with --user"
+          elif python3 -m pip install mutagen --break-system-packages 2>/dev/null; then
+            echo "✅ Installed mutagen via python -m pip with --break-system-packages"
+          elif python3 -m pip install mutagen --user 2>/dev/null; then
+            echo "✅ Installed mutagen via python -m pip with --user"
+          else
+            echo "⚠️ Could not install mutagen - tests will run with limited functionality"
+            echo "This is acceptable for CI environments"
+          fi
+        fi
+        
+    - name: 🧪 Run Test Suites
+      run: |
+        cd swift-tagger
+        chmod +x run_tests.sh
+        ./run_tests.sh
 
