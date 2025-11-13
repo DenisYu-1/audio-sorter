@@ -1,4 +1,5 @@
 import Cocoa
+import AudioSorterCore
 
 class MainViewController: NSViewController {
     private var folderLabel: NSTextField!

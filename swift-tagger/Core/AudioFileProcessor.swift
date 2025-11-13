@@ -1,8 +1,10 @@
 import Foundation
 
-class AudioFileProcessor {
+public class AudioFileProcessor {
     
-    func processDirectorySync(_ directoryURL: URL, bookId: String, logger: @escaping (String) -> Void) -> ProcessingResults {
+    public init() {}
+    
+    public func processDirectorySync(_ directoryURL: URL, bookId: String, logger: @escaping (String) -> Void) -> ProcessingResults {
         
         var filesRenamed = 0
         var tagsUpdated = 0

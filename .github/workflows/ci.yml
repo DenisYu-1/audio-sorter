@@ -15,13 +15,19 @@ jobs:
     - name: 📥 Checkout Code
       uses: actions/checkout@v4
       
-    - name: 🔨 Test Swift Compilation
+    - name: 🔨 Build Swift Package
       run: |
         cd swift-tagger
-        echo "Testing Swift compilation..."
-        swiftc main.swift Utils/AppDelegate.swift UI/MainViewController.swift UI/DragDropView.swift Core/AudioFileProcessor.swift Core/ProcessingResults.swift -o SimpleAudioSorter-test
-        echo "✅ Swift compilation successful"
-        rm -f SimpleAudioSorter-test
+        echo "Building Swift package..."
+        swift build
+        echo "✅ Swift build successful"
+        
+    - name: 🧪 Run Swift Tests
+      run: |
+        cd swift-tagger
+        echo "Running Swift tests..."
+        swift test
+        echo "✅ Swift tests passed"
         
     - name: 🐍 Test Python Syntax
       run: |
@@ -35,4 +41,4 @@ jobs:
         bash -n create-distribution.sh
         bash -n swift-tagger/create-gui-app-bundle.sh
         echo "✅ Shell scripts syntax is valid"
-
+ 

@@ -9,13 +9,16 @@ BINARY_NAME="SimpleAudioSorter"
 
 echo "Creating macOS GUI App Bundle: $BUNDLE_NAME"
 
-# Compile all Swift files into the binary
-echo "🔨 Compiling modularized Swift source files..."
-if ! swiftc main.swift Utils/AppDelegate.swift UI/MainViewController.swift UI/DragDropView.swift Core/AudioFileProcessor.swift Core/ProcessingResults.swift -o "$BINARY_NAME"; then
-    echo "❌ Error: Failed to compile Swift files"
+# Build using Swift Package Manager
+echo "🔨 Building with Swift Package Manager..."
+if ! swift build -c release; then
+    echo "❌ Error: Failed to build Swift package"
     exit 1
 fi
-echo "✅ Compilation successful"
+echo "✅ Build successful"
+
+# Copy the built binary from .build directory
+cp ".build/release/$BINARY_NAME" "$BINARY_NAME"
 
 # Remove existing bundle if it exists
 if [[ -d "$BUNDLE_NAME" ]]; then
