@@ -32,9 +32,9 @@ let package = Package(
                 "Audio Sorter.app",
                 "Audio Sorter.zip",
                 "create-gui-app-bundle.sh",
-                "run_core_tests.sh",
-                "test_core_functionality.py",
-                "update-mp3-tags.py"
+                "update-mp3-tags.py",
+                "SimpleAudioSorter",
+                "__pycache__"
             ],
             sources: [
                 "main.swift",

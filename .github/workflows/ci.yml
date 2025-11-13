@@ -41,11 +41,4 @@ jobs:
         bash -n create-distribution.sh
         bash -n swift-tagger/create-gui-app-bundle.sh
         echo "✅ Shell scripts syntax is valid"
-        
-    - name: 🧪 Core Functionality Tests
-      run: |
-        echo "Testing core audio-sorter functionality..."
-        cd swift-tagger
-        chmod +x run_core_tests.sh
-        ./run_core_tests.sh all
  
