@@ -100,9 +100,38 @@ mkdir -p "$PYTHON_LIBS_DIR"
 # Install mutagen into the app bundle
 pip3 install --target "$PYTHON_LIBS_DIR" mutagen
 
-echo "📦 Distribution:"
-echo "   Copy '$BUNDLE_NAME' to any Mac and double-click!"
-echo "   ✅ Universal Binary: Works on Intel & Apple Silicon Macs"
-echo "   ✅ Zero Dependencies: mutagen bundled inside app"
-echo "   ✅ Minimum macOS: 12.0 Monterey"
-echo "   ✅ Built with SwiftUI for modern UI"
+# Remove quarantine attributes to prevent Gatekeeper issues
+echo "🔓 Removing quarantine attributes..."
+xattr -cr "$BUNDLE_NAME"
+
+# Create distributable zip
+echo "📦 Creating distributable zip..."
+rm -f "$BUNDLE_NAME.zip"
+ditto -c -k --keepParent "$BUNDLE_NAME" "$BUNDLE_NAME.zip"
+
+# Remove quarantine from the zip too
+xattr -cr "$BUNDLE_NAME.zip"
+
+echo ""
+echo "✅ Distribution package created!"
+echo ""
+echo "📦 Files created:"
+echo "   • $BUNDLE_NAME (app bundle)"
+echo "   • $BUNDLE_NAME.zip (distributable)"
+echo ""
+echo "🚀 To run locally:"
+echo "   open '$BUNDLE_NAME'"
+echo ""
+echo "📨 To distribute:"
+echo "   Share '$BUNDLE_NAME.zip'"
+echo ""
+echo "⚠️  First-time users need to:"
+echo "   1. Extract the zip"
+echo "   2. Right-click the app → Open (first time only)"
+echo "   3. Click 'Open' in the security dialog"
+echo ""
+echo "✅ Features:"
+echo "   • Universal Binary: Intel & Apple Silicon"
+echo "   • Zero Dependencies: mutagen bundled"
+echo "   • Minimum macOS: 12.0 Monterey"
+echo "   • Built with SwiftUI"
