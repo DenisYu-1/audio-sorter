@@ -60,6 +60,7 @@ error.log
 
 # Build Artifacts
 build/
+.build/
 *.dSYM/
 
 # Audio Files (don't commit sample audio)
