@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "AudioSorter",
     platforms: [
-        .macOS(.v11)
+        .macOS(.v12)
     ],
     products: [
         .executable(
@@ -19,8 +19,7 @@ let package = Package(
     targets: [
         .target(
             name: "AudioSorterCore",
-            path: "Core",
-            exclude: []
+            path: "Core"
         ),
         .executableTarget(
             name: "SimpleAudioSorter",
@@ -33,10 +32,9 @@ let package = Package(
                 "update-mp3-tags.py"
             ],
             sources: [
-                "main.swift",
-                "UI/DragDropView.swift",
-                "UI/MainViewController.swift",
-                "Utils/AppDelegate.swift"
+                "AudioSorterApp.swift",
+                "UI/ContentView.swift",
+                "UI/AudioSorterViewModel.swift"
             ]
         ),
         .testTarget(
