@@ -29,12 +29,8 @@ let package = Package(
             exclude: [
                 "Core",
                 "Tests",
-                "Audio Sorter.app",
-                "Audio Sorter.zip",
                 "create-gui-app-bundle.sh",
-                "update-mp3-tags.py",
-                "SimpleAudioSorter",
-                "__pycache__"
+                "update-mp3-tags.py"
             ],
             sources: [
                 "main.swift",
