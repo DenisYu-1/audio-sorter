@@ -1,13 +1,12 @@
 #!/bin/bash
 
-# Create macOS GUI App Bundle for Audio Sorter
-# This version is properly configured for GUI operation
+# Create macOS GUI App Bundle for Audio Sorter (SwiftUI version)
 
 APP_NAME="Audio Sorter"
 BUNDLE_NAME="Audio Sorter.app"
 BINARY_NAME="SimpleAudioSorter"
 
-echo "Creating macOS GUI App Bundle: $BUNDLE_NAME"
+echo "Creating macOS SwiftUI App Bundle: $BUNDLE_NAME"
 
 # Build using Swift Package Manager
 echo "🔨 Building with Swift Package Manager..."
@@ -33,7 +32,7 @@ mkdir -p "$BUNDLE_NAME/Contents/Resources"
 # Copy binary
 cp "$BINARY_NAME" "$BUNDLE_NAME/Contents/MacOS/"
 
-# Create properly configured Info.plist for GUI app
+# Create properly configured Info.plist for SwiftUI GUI app
 cat > "$BUNDLE_NAME/Contents/Info.plist" << 'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -50,11 +49,11 @@ cat > "$BUNDLE_NAME/Contents/Info.plist" << 'EOF'
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0</string>
+    <string>2.0</string>
     <key>CFBundleVersion</key>
-    <string>1</string>
+    <string>2.0</string>
     <key>LSMinimumSystemVersion</key>
-    <string>10.15</string>
+    <string>12.0</string>
     <key>NSHumanReadableCopyright</key>
     <string>© 2024 Audio Sorter</string>
     <key>NSPrincipalClass</key>
@@ -80,17 +79,18 @@ EOF
 # Make the binary executable
 chmod +x "$BUNDLE_NAME/Contents/MacOS/$BINARY_NAME"
 
-echo "✅ GUI App bundle created: $BUNDLE_NAME"
+echo "✅ SwiftUI App bundle created: $BUNDLE_NAME"
 echo ""
-echo "🖥️  To run the GUI app:"
+echo "🖥️  To run the SwiftUI app:"
 echo "   open '$BUNDLE_NAME'"
 echo ""
-echo "📱 App features:"
-echo "   • Native macOS GUI interface"
+echo "📱 SwiftUI App features:"
+echo "   • Modern SwiftUI interface"
+echo "   • Native macOS design"
 echo "   • Drag & drop folder selection"
 echo "   • Real-time progress display"
 echo "   • Live logging of operations"
-echo "   • Zero installation required"
+echo "   • Declarative UI architecture"
 echo ""
 # Install bundled Python dependencies
 echo "📦 Installing bundled Python dependencies..."
@@ -104,4 +104,5 @@ echo "📦 Distribution:"
 echo "   Copy '$BUNDLE_NAME' to any Mac and double-click!"
 echo "   ✅ Universal Binary: Works on Intel & Apple Silicon Macs"
 echo "   ✅ Zero Dependencies: mutagen bundled inside app"
-echo "   ✅ Minimum macOS: 10.15 Catalina"
+echo "   ✅ Minimum macOS: 12.0 Monterey"
+echo "   ✅ Built with SwiftUI for modern UI"
