@@ -4,6 +4,7 @@ import AudioSorterCore
 class MainViewController: NSViewController {
     private var folderLabel: NSTextField!
     private var bookIdField: NSTextField!
+    private var applyBookIdButton: NSButton!
     private var logTextView: NSTextView!
     private var processButton: NSButton!
     private var progressIndicator: NSProgressIndicator!
@@ -63,9 +64,13 @@ class MainViewController: NSViewController {
         
         bookIdField = NSTextField(string: "AudioBook")
         bookIdField.frame = NSRect(x: 30, y: 245, width: 200, height: 25)
-        bookIdField.target = self
-        bookIdField.action = #selector(bookIdChanged)
+        bookIdField.placeholderString = "Enter book or album name"
         view.addSubview(bookIdField)
+        
+        applyBookIdButton = NSButton(title: "Apply", target: self, action: #selector(applyBookId))
+        applyBookIdButton.frame = NSRect(x: 240, y: 245, width: 70, height: 25)
+        applyBookIdButton.bezelStyle = .rounded
+        view.addSubview(applyBookIdButton)
         
         // Options info
         let optionsLabel = NSTextField(labelWithString: "What this app does:")
@@ -119,9 +124,7 @@ class MainViewController: NSViewController {
         scrollView.documentView = logTextView
         view.addSubview(scrollView)
         
-        // Set book ID from field
-        bookId = bookIdField.stringValue
-        updateProcessButtonState()
+        applyBookId()
         
         addLogMessage("Welcome! Drag a folder with numbered MP3 files or click 'Choose Folder...'")
     }
@@ -144,9 +147,13 @@ class MainViewController: NSViewController {
         }
     }
     
-    @objc private func bookIdChanged() {
+    @objc private func applyBookId() {
         bookId = bookIdField.stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
         updateProcessButtonState()
+        
+        if !bookId.isEmpty {
+            addLogMessage("📚 Book/Album name set to: '\(bookId)'")
+        }
     }
     
     private func updateProcessButtonState() {

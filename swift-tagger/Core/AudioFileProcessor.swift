@@ -148,14 +148,34 @@ public class AudioFileProcessor {
         return mp3Files.sorted { $0.1 < $1.1 }
     }
     
-    private func readExistingTags(from fileURL: URL) -> (trackNumber: Int?, album: String?, title: String?) {
-        // Get the Python script path
-        let bundlePath = Bundle.main.bundlePath
-        let scriptPath = URL(fileURLWithPath: bundlePath)
-            .deletingLastPathComponent()
-            .appendingPathComponent("update-mp3-tags.py")
+    private func findPythonScript() -> URL? {
+        let scriptName = "update-mp3-tags.py"
         
-        guard FileManager.default.fileExists(atPath: scriptPath.path) else {
+        let candidatePaths = [
+            URL(fileURLWithPath: Bundle.main.bundlePath)
+                .deletingLastPathComponent()
+                .appendingPathComponent(scriptName),
+            
+            URL(fileURLWithPath: #file)
+                .deletingLastPathComponent()
+                .deletingLastPathComponent()
+                .appendingPathComponent(scriptName),
+            
+            URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+                .appendingPathComponent(scriptName)
+        ]
+        
+        for path in candidatePaths {
+            if FileManager.default.fileExists(atPath: path.path) {
+                return path
+            }
+        }
+        
+        return nil
+    }
+    
+    private func readExistingTags(from fileURL: URL) -> (trackNumber: Int?, album: String?, title: String?) {
+        guard let scriptPath = findPythonScript() else {
             return (nil, nil, nil)
         }
         
@@ -206,15 +226,8 @@ public class AudioFileProcessor {
     
     private func updateTrackNumberSync(for fileURL: URL, trackNumber: Int, bookId: String, logger: @escaping (String) -> Void) -> Bool {
         
-        // Get the directory where this app bundle is located
-        let bundlePath = Bundle.main.bundlePath
-        let scriptPath = URL(fileURLWithPath: bundlePath)
-            .deletingLastPathComponent()
-            .appendingPathComponent("update-mp3-tags.py")
-        
-        // Check if the Python script exists
-        guard FileManager.default.fileExists(atPath: scriptPath.path) else {
-            logger("⚠️ Tag update script not found: \(scriptPath.lastPathComponent)")
+        guard let scriptPath = findPythonScript() else {
+            logger("⚠️ Tag update script not found: update-mp3-tags.py")
             return false
         }
         
